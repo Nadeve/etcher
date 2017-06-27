@@ -44,6 +44,10 @@ if [ -z "$ARGV_OPERATING_SYSTEM" ] || [ -z "$ARGV_ARCHITECTURE" ]; then
   usage
 fi
 
+if [ "${GH_TOKEN:-false}" != "false" ]; then
+  export PUBLISH=1
+fi
+
 if [ "$ARGV_OPERATING_SYSTEM" == "linux" ]; then
   ./scripts/build/docker/run-command.sh \
     -r "$TARGET_ARCH" \

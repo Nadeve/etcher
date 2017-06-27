@@ -3,7 +3,10 @@ copyright: Copyright 2016 Resinio Ltd
 productName: Etcher
 npmRebuild: true
 nodeGypRebuild: true
-publish: null
+publish:
+  - provider: github
+    repo: etcher
+    owner: resin-io
 files:
   - lib
   - assets/icon.png
@@ -47,6 +50,7 @@ linux:
 deb:
   icon: assets/icon.png
   priority: optional
+  publish: null
   depends:
     - gconf2
     - gconf-service
@@ -85,6 +89,7 @@ deb:
     - polkit-1-auth-agent | policykit-1-gnome | polkit-kde-1
 rpm:
   icon: assets/icon.png
+  publish: null
   depends:
     - lsb
     - libXScrnSaver
