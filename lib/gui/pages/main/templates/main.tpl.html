@@ -1,40 +1,119 @@
+<style>
+  input {
+    transition: all 150ms ease;
+    border: 1px solid transparent;
+  }
+  .hasError {
+    border: 1px solid #dc6262;
+    background-color: #f7cbcb;
+  }
+
+</style>
 <div class="page-main row around-xs">
-  <div class="col-xs" ng-controller="ImageSelectionController as image">
-    <div class="box text-center relative" os-dropzone="image.selectImageByPath($file)">
+
+  <div class="col-xs" ng-controller="DownloadController as dl">
+    <div class="box text-center relative">
+      <div class="step-border-right" ng-disabled="main.shouldFlashStepBeDisabled()"></div>
 
       <div class="center-block">
-        <svg-icon path="main.selection.getImageLogo() || '../assets/image.svg'"></svg-icon>
+        <svg-icon path="'../assets/download-2.svg'"
+                  disabled="main.shouldDriveStepBeDisabled()"></svg-icon>
+
       </div>
 
       <div class="space-vertical-large">
-        <div ng-hide="main.selection.hasImage()">
-          <button
-            class="button button-primary button-brick"
-            ng-click="image.openImageSelector()">Select image</button>
-
-          <p class="step-footer">
-            {{ ::image.mainSupportedExtensions.join(', ') }}, and
-            <span class="step-footer-underline"
-              uib-tooltip="{{ image.extraSupportedExtensions.join(', ') }}">others</span>
-          </p>
-        </div>
-        <div ng-if="main.selection.hasImage()">
-          <div class="step-selection-text">
-            <span
-              ng-click="main.showSelectedImageDetails()"
-              class="step-image step-name"
-              ng-bind="main.selection.getImageName() || image.getImageBasename() | middleEllipses:20"
-              uib-tooltip="{{ image.getImageBasename() }}"></span>
-            <span class="step-image step-size">{{ main.selection.getImageSize() | gigabyte | number:1 }} GB</span>
+          <div class="row" ng-hide="dl.loginFinished || dl.ftpStatus.indexOf('error') !== -1">
+            <label class="col-xs-10 col-xs-offset-1">
+              <input ng-model="dl.username" class="form-control" type="text" placeholder="Username"
+                     ng-class="{hasError: dl.formErrors}">
+            </label>
+            <label class="col-xs-10 col-xs-offset-1">
+              <input ng-model="dl.password" class="form-control" type="Password" placeholder="Password"
+                     ng-class="{hasError: dl.formErrors}">
+            </label>
           </div>
 
-          <button class="button button-link step-footer"
-            ng-click="image.reselectImage()"
-            ng-hide="main.state.isFlashing()">Change</button>
+            <button class="button button-primary button-brick col-xs-10 col-xs-offset-1"
+                    ng-hide="dl.loginFinished || dl.ftpStatus.indexOf('error') !== -1"
+                    ng-click="dl.download()">Download AnyOS</button>
+
+
+
+        <div class="row" ng-hide="dl.ftpStatus.indexOf('error') === -1">
+          <div class="col-xs-12">
+            <span class="text-center step-size" ng-if="dl.ftpStatus === 'dlerror'">Download error, please try again later.</span>
+            <span class="text-center step-size" ng-if="dl.ftpStatus === 'verror'">Error Verifying AnyOS image.</span>
+            <button class="button button-danger button-brick col-xs-10 col-xs-offset-1"
+                    style="margin-top: 40px;"
+                    ng-click="dl.init()">Retry</button>
+          </div>
         </div>
+
+        <div class="row" ng-show="dl.loginFinished">
+
+          <div class="col-xs-12" ng-show="dl.ftpStatus === 'connecting'">
+            <span class="text-center">Connecting...</span>
+          </div>
+
+          <div class="progress" ng-show="dl.ftpStatus === 'downloading'">
+            <div class="progress-bar progress-bar-striped" role="progressbar"
+                 ng-class="{active: dl.progress.percent < 100, 'progress-bar-striped': dl.progress.percent < 100, 'progress-bar-success': dl.progress.percent == 100}"
+                 ng-style="{width: dl.progress.percent + '%'}"
+                 aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+
+          <div class="col-xs-12" ng-show="dl.ftpStatus === 'downloading'">
+            <span class="text-center step-size">{{dl.progress.accum}} / {{dl.progress.size}} {{"(" + dl.progress.percent + "%)"}} <br/>{{dl.progress.speed}}
+              ({{dl.progress.eta | amDurationFormat: 'millisecond'}} remaining)
+            </span>
+          </div>
+
+          <div class="col-xs-12" ng-show="dl.ftpStatus === 'done'">
+            <span class="text-center step-size">content hash: {{dl.hash}}</span>
+          </div>
+
+        </div>
+
       </div>
     </div>
   </div>
+
+  <!--<div class="col-xs" ng-controller="ImageSelectionController as image">-->
+    <!--<div class="box text-center relative" os-dropzone="image.selectImageByPath($file)">-->
+
+      <!--<div class="center-block">-->
+        <!--<svg-icon path="main.selection.getImageLogo() || '../assets/image.svg'"></svg-icon>-->
+      <!--</div>-->
+
+      <!--<div class="space-vertical-large">-->
+        <!--<div ng-hide="main.selection.hasImage()">-->
+          <!--<button-->
+            <!--class="button button-primary button-brick"-->
+            <!--ng-click="image.openImageSelector()">Select image</button>-->
+
+          <!--<p class="step-footer">-->
+            <!--{{ ::image.mainSupportedExtensions.join(', ') }}, and-->
+            <!--<span class="step-footer-underline"-->
+              <!--uib-tooltip="{{ image.extraSupportedExtensions.join(', ') }}">others</span>-->
+          <!--</p>-->
+        <!--</div>-->
+        <!--<div ng-if="main.selection.hasImage()">-->
+          <!--<div class="step-selection-text">-->
+            <!--<span-->
+              <!--ng-click="main.showSelectedImageDetails()"-->
+              <!--class="step-image step-name"-->
+              <!--ng-bind="main.selection.getImageName() || image.getImageBasename() | middleEllipses:20"-->
+              <!--uib-tooltip="{{ image.getImageBasename() }}"></span>-->
+            <!--<span class="step-image step-size">{{ main.selection.getImageSize() | gigabyte | number:1 }} GB</span>-->
+          <!--</div>-->
+
+          <!--<button class="button button-link step-footer"-->
+            <!--ng-click="image.reselectImage()"-->
+            <!--ng-hide="main.state.isFlashing()">Change</button>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</div>-->
 
   <div class="col-xs" ng-controller="DriveSelectionController as drive">
     <div class="box text-center relative">
