@@ -55,7 +55,7 @@
             <span class="text-center">Connecting...</span>
           </div>
 
-          <div class="progress" ng-show="dl.ftpStatus === 'downloading'">
+          <div class="progress col-xs-8 col-xs-offset-2" ng-show="dl.ftpStatus === 'downloading'" style="padding: 0">
             <div class="progress-bar progress-bar-striped" role="progressbar"
                  ng-class="{active: dl.progress.percent < 100, 'progress-bar-striped': dl.progress.percent < 100, 'progress-bar-success': dl.progress.percent == 100}"
                  ng-style="{width: dl.progress.percent + '%'}"
@@ -69,7 +69,7 @@
           </div>
 
           <div class="col-xs-12" ng-show="dl.ftpStatus === 'done'">
-            <span class="text-center step-size">content hash: {{dl.hash}}</span>
+            <span class="text-center step-size">Image Verified Successfully!</span>
           </div>
 
         </div>

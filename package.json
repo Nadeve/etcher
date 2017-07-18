@@ -3,7 +3,7 @@
   "displayName": "Etcher",
   "version": "1.0.0",
   "updates": {
-    "enabled": true,
+    "enabled": false,
     "sleepDays": 7,
     "semverRange": "<2.0.0"
   },
