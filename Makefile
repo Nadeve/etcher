@@ -190,9 +190,6 @@ define execute-command
 
 endef
 
-CHANGELOG.md:
-	$(NPX) versionist
-
 $(BUILD_DIRECTORY):
 	mkdir $@
 
@@ -278,12 +275,14 @@ assets/osx/installer.tiff: assets/osx/installer.png assets/osx/installer@2x.png
 $(BUILD_DIRECTORY)/$(APPLICATION_NAME)-$(APPLICATION_VERSION)-darwin-$(TARGET_ARCH).dmg: assets/osx/installer.tiff \
 	| $(BUILD_DIRECTORY)
 	TARGET_ARCH=$(TARGET_ARCH) $(NPX) build --mac dmg $(ELECTRON_BUILDER_OPTIONS) \
-		 --extraMetadata.version=$(APPLICATION_VERSION)
+		--extraMetadata.version=$(APPLICATION_VERSION) \
+		--extraMetadata.packageType=dmg
 
 $(BUILD_DIRECTORY)/$(APPLICATION_NAME)-$(APPLICATION_VERSION)-darwin-$(TARGET_ARCH).zip: assets/osx/installer.tiff \
 	| $(BUILD_DIRECTORY)
 	TARGET_ARCH=$(TARGET_ARCH) $(NPX) build --mac zip $(ELECTRON_BUILDER_OPTIONS) \
-		 --extraMetadata.version=$(APPLICATION_VERSION)
+		--extraMetadata.version=$(APPLICATION_VERSION) \
+		--extraMetadata.packageType=zip
 
 APPLICATION_NAME_ELECTRON = $(APPLICATION_NAME_LOWERCASE)-electron
 
@@ -292,6 +291,7 @@ $(BUILD_DIRECTORY)/$(APPLICATION_NAME_ELECTRON)-$(APPLICATION_VERSION_REDHAT).$(
 	$(NPX) build --linux rpm $(ELECTRON_BUILDER_OPTIONS) \
 		--extraMetadata.name=$(APPLICATION_NAME_ELECTRON) \
 		--extraMetadata.version=$(APPLICATION_VERSION_REDHAT) \
+		--extraMetadata.packageType=rpm \
 		$(DISABLE_UPDATES_ELECTRON_BUILDER_OPTIONS)
 
 $(BUILD_DIRECTORY)/$(APPLICATION_NAME_ELECTRON)_$(APPLICATION_VERSION_DEBIAN)_$(TARGET_ARCH_DEBIAN).deb: \
@@ -299,12 +299,14 @@ $(BUILD_DIRECTORY)/$(APPLICATION_NAME_ELECTRON)_$(APPLICATION_VERSION_DEBIAN)_$(
 	$(NPX) build --linux deb $(ELECTRON_BUILDER_OPTIONS) \
 		--extraMetadata.name=$(APPLICATION_NAME_ELECTRON) \
 		--extraMetadata.version=$(APPLICATION_VERSION_DEBIAN) \
+		--extraMetadata.packageType=deb \
 		$(DISABLE_UPDATES_ELECTRON_BUILDER_OPTIONS)
 
 $(BUILD_DIRECTORY)/$(APPLICATION_NAME_LOWERCASE)-$(APPLICATION_VERSION)-$(TARGET_ARCH_APPIMAGE).AppImage: \
 	| $(BUILD_DIRECTORY)
 	$(NPX) build --linux AppImage $(ELECTRON_BUILDER_OPTIONS) \
-		 --extraMetadata.version=$(APPLICATION_VERSION)
+		--extraMetadata.version=$(APPLICATION_VERSION) \
+		--extraMetadata.packageType=AppImage
 
 $(BUILD_DIRECTORY)/$(APPLICATION_NAME_LOWERCASE)-$(APPLICATION_VERSION)-linux-$(TARGET_ARCH).zip: \
 	$(BUILD_DIRECTORY)/$(APPLICATION_NAME_LOWERCASE)-$(APPLICATION_VERSION)-$(TARGET_ARCH_APPIMAGE).AppImage \
@@ -314,12 +316,14 @@ $(BUILD_DIRECTORY)/$(APPLICATION_NAME_LOWERCASE)-$(APPLICATION_VERSION)-linux-$(
 $(BUILD_DIRECTORY)/$(APPLICATION_NAME)-$(APPLICATION_VERSION)-win32-$(TARGET_ARCH)-portable.exe: \
 	| $(BUILD_DIRECTORY)
 	TARGET_ARCH=$(TARGET_ARCH) $(NPX) build --win portable $(ELECTRON_BUILDER_OPTIONS) \
-		 --extraMetadata.version=$(APPLICATION_VERSION)
+		--extraMetadata.version=$(APPLICATION_VERSION) \
+		--extraMetadata.packageType=portable
 
 $(BUILD_DIRECTORY)/$(APPLICATION_NAME)-$(APPLICATION_VERSION)-win32-$(TARGET_ARCH).exe: \
 	| $(BUILD_DIRECTORY)
 	TARGET_ARCH=$(TARGET_ARCH) $(NPX) build --win nsis $(ELECTRON_BUILDER_OPTIONS) \
-		 --extraMetadata.version=$(APPLICATION_VERSION)
+		--extraMetadata.version=$(APPLICATION_VERSION) \
+		--extraMetadata.packageType=nsis
 
 # ---------------------------------------------------------------------
 # Phony targets
@@ -340,11 +344,15 @@ TARGETS = \
 	sanity-checks \
 	clean \
 	distclean \
+	changelog \
 	package-electron \
 	package-cli \
 	cli-develop \
 	installers-all \
 	electron-develop
+
+changelog:
+	$(NPX) versionist
 
 package-electron:
 	TARGET_ARCH=$(TARGET_ARCH) $(NPX) build --dir $(ELECTRON_BUILDER_OPTIONS)

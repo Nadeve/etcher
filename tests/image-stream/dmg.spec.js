@@ -27,6 +27,8 @@ const tester = require('./tester');
 
 describe('ImageStream: DMG', function() {
 
+  this.timeout(tester.DEFAULT_IMAGE_TESTS_TIMEOUT);
+
   describe('compression method', function() {
 
     describe('NONE', function() {
